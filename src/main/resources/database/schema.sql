@@ -55,6 +55,8 @@ CREATE TABLE art (
     theme VARCHAR(100) COMMENT '사조',
     display BOOLEAN DEFAULT TRUE COMMENT '전시 여부',
 
+    url VARCHAR(500) COMMENT '작품 이미지 URL',
+
     artist_id VARCHAR(50) COMMENT '화가 ID',
     gallery_id VARCHAR(50) COMMENT '소장처 ID',
 

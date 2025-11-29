@@ -16,6 +16,9 @@ public class Art {
     private String theme;
     private Boolean display;
 
+    @Column(name = "url")
+    private String url;
+
     @ManyToOne
     @JoinColumn(name = "artist_id")
     private Artist artist;
