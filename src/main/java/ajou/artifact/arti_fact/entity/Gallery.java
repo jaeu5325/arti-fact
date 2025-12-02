@@ -1,7 +1,11 @@
 package ajou.artifact.arti_fact.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "gallery")
 public class Gallery {
