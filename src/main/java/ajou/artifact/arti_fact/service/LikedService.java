@@ -1,6 +1,6 @@
 package ajou.artifact.arti_fact.service;
 
-import ajou.artifact.arti_fact.controller.dto.LikedDto;
+import ajou.artifact.arti_fact.dto.LikedDto;
 import ajou.artifact.arti_fact.entity.Art;
 import ajou.artifact.arti_fact.entity.Liked;
 import ajou.artifact.arti_fact.entity.Users;

@@ -1,6 +1,6 @@
 package ajou.artifact.arti_fact.controller;
 
-import ajou.artifact.arti_fact.controller.dto.ArtDto;
+import ajou.artifact.arti_fact.dto.ArtDto;
 import ajou.artifact.arti_fact.entity.Art;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

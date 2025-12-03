@@ -1,4 +1,4 @@
-package ajou.artifact.arti_fact.controller.dto;
+package ajou.artifact.arti_fact.dto;
 
 import ajou.artifact.arti_fact.entity.Liked;
 import io.swagger.v3.oas.annotations.media.Schema;

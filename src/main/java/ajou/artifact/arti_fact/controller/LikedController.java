@@ -1,7 +1,7 @@
 package ajou.artifact.arti_fact.controller;
 
+import ajou.artifact.arti_fact.dto.LikedDto;
 import ajou.artifact.arti_fact.service.LikedService;
-import ajou.artifact.arti_fact.controller.dto.LikedDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
