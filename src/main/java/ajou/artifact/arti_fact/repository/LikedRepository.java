@@ -1,4 +1,4 @@
-package ajou.artifact.arti_fact.reposiroty;
+package ajou.artifact.arti_fact.repository;
 
 import ajou.artifact.arti_fact.entity.Liked;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,3 +10,4 @@ public interface LikedRepository extends JpaRepository<Liked, Long> {
     Optional<Liked> findByUser_UserIdAndArt_Id(Long userId, Long artId);
     void deleteByUser_UserIdAndArt_Id(Long userId, Long artId);
 }
+

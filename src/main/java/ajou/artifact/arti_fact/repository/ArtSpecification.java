@@ -1,4 +1,4 @@
-package ajou.artifact.arti_fact.reposiroty;
+package ajou.artifact.arti_fact.repository;
 
 import ajou.artifact.arti_fact.entity.Art;
 import ajou.artifact.arti_fact.entity.Artist;
@@ -38,3 +38,4 @@ public class ArtSpecification {
         };
     }
 }
+

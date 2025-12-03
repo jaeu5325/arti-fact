@@ -1,8 +1,8 @@
 package ajou.artifact.arti_fact.service;
 
 import ajou.artifact.arti_fact.entity.Art;
-import ajou.artifact.arti_fact.reposiroty.ArtRepository;
-import ajou.artifact.arti_fact.reposiroty.ArtSpecification;
+import ajou.artifact.arti_fact.repository.ArtRepository;
+import ajou.artifact.arti_fact.repository.ArtSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

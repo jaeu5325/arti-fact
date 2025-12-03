@@ -3,10 +3,10 @@ package ajou.artifact.arti_fact.service;
 import ajou.artifact.arti_fact.dto.LikedDto;
 import ajou.artifact.arti_fact.entity.Art;
 import ajou.artifact.arti_fact.entity.Liked;
-import ajou.artifact.arti_fact.entity.Users;
-import ajou.artifact.arti_fact.reposiroty.ArtRepository;
-import ajou.artifact.arti_fact.reposiroty.LikedRepository;
-import ajou.artifact.arti_fact.reposiroty.UserRepository;
+import ajou.artifact.arti_fact.entity.User;
+import ajou.artifact.arti_fact.repository.ArtRepository;
+import ajou.artifact.arti_fact.repository.LikedRepository;
+import ajou.artifact.arti_fact.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +35,7 @@ public class LikedService {
 
     @Transactional
     public LikedDto.Response addLikedItem(LikedDto.Create request) {
-        Users user = userRepository.findById(request.getUserId())
+        User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + request.getUserId()));
 
         Art art = artRepository.findById(request.getArtId())
