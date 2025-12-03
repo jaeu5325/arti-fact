@@ -25,4 +25,10 @@ public class Liked {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "Art_ID", nullable = false)
     private Art art;
+
+    // User와 Art를 받는 생성자
+    public Liked(User user, Art art) {
+        this.user = user;
+        this.art = art;
+    }
 }

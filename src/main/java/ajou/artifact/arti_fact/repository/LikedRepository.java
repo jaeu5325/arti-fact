@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface LikedRepository extends JpaRepository<Liked, Long> {
     List<Liked> findByUser_UserId(Long userId);
-    Optional<Liked> findByUser_UserIdAndArt_Id(Long userId, Long artId);
-    void deleteByUser_UserIdAndArt_Id(Long userId, Long artId);
+    Optional<Liked> findByUser_UserIdAndArt_ArtId(Long userId, String artId);
+    void deleteByUser_UserIdAndArt_ArtId(Long userId, String artId);
 }
 

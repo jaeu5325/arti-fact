@@ -1,6 +1,6 @@
 package ajou.artifact.arti_fact.controller;
 
-import ajou.artifact.arti_fact.entity.Users;
+import ajou.artifact.arti_fact.entity.User;
 import ajou.artifact.arti_fact.service.UsersService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -40,27 +40,28 @@ public class UsersController {
             return;
         }
 
-        // 중복 회원 체크
-        if (usersService.existsById(userId)) {
+        // Entity 생성
+        User newUser = User.builder()
+                .email(userId)  // userId를 email로 사용
+                .name(name)
+                .password(pw)
+                .birthDate(birthDate)
+                .build();
+
+        // 중복 회원 체크 (이메일로)
+        if (usersService.existsByEmail(newUser.getEmail())) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write("{\"message\": \"이미 존재하는 사용자입니다.\"}");
             return;
         }
 
-        // Entity 생성
-        Users newUser = new Users();
-        newUser.setUserId(userId);
-        newUser.setName(name);
-        newUser.setPw(pw);
-        newUser.setBirthDate(birthDate);
-
         // Service를 통해 DB에 저장
-        Users savedUser = usersService.registerUser(newUser);
+        User savedUser = usersService.registerUser(newUser);
 
         // 성공 응답
         response.setStatus(HttpServletResponse.SC_CREATED);
         response.getWriter().write(
-                String.format("{\"message\": \"회원가입 성공\", \"userId\": \"%s\"}", savedUser.getUserId())
+                String.format("{\"message\": \"회원가입 성공\", \"userId\": \"%d\"}", savedUser.getUserId())
         );
     }
 
@@ -80,11 +81,10 @@ public class UsersController {
             return;
         }
 
-        // 서비스에서 로그인 검증
-        Users user = usersService.login(userId, pw);
+        // 서비스에서 로그인 검증 (이메일과 비밀번호로)
+        User user = usersService.login(userId, pw);
 
-        if (user == null) {
-            // 로그인 실패
+        if (user == null) {            
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write("{\"message\": \"로그인 실패\"}");
             return;
@@ -93,21 +93,20 @@ public class UsersController {
         // 로그인 성공
         response.setStatus(HttpServletResponse.SC_OK);
         response.getWriter().write(
-                String.format("{\"message\": \"로그인 성공\", \"userId\": \"%s\"}", user.getUserId())
+                String.format("{\"message\": \"로그인 성공\", \"userId\": \"%d\"}", user.getUserId())
         );
     }
 
     // 마이페이지
     @GetMapping("/{userId}")
-    public void getUserInfo(@PathVariable String userId,
+    public void getUserInfo(@PathVariable Long userId,
                             HttpServletResponse response) throws IOException {
 
         response.setContentType("application/json; charset=UTF-8");
 
-        Users user = usersService.getUserById(userId);
+        User user = usersService.getUserById(userId);
 
-        if (user == null) {
-            // 유저 없음
+        if (user == null) {        
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write("{\"message\": \"사용자를 찾을 수 없습니다.\"}");
             return;
@@ -115,9 +114,10 @@ public class UsersController {
 
         // 유저 정보 JSON 생성
         String userJson = String.format(
-                "{\"message\": \"사용자 정보 조회 성공\", \"data\": {\"userId\": \"%s\", \"name\": \"%s\", \"birthDate\": \"%s\"}}",
+                "{\"message\": \"사용자 정보 조회 성공\", \"data\": {\"userId\": \"%d\", \"name\": \"%s\", \"email\": \"%s\", \"birthDate\": \"%s\"}}",
                 user.getUserId(),
                 user.getName(),
+                user.getEmail(),
                 user.getBirthDate() != null ? user.getBirthDate().toString() : "null"
         );
 
@@ -127,7 +127,7 @@ public class UsersController {
 
     // 회원정보 수정
     @PutMapping("/{userId}")
-    public void updateUser(@PathVariable String userId,
+    public void updateUser(@PathVariable Long userId,
                         HttpServletRequest request,
                         HttpServletResponse response) throws IOException {
 
@@ -142,7 +142,7 @@ public class UsersController {
             birthDate = LocalDate.parse(birthDateStr);
         }
 
-        Users updated = usersService.updateUser(userId, name, pw, birthDate);
+        User updated = usersService.updateUser(userId, name, pw, birthDate);
 
         if (updated == null) {
             response.setStatus(HttpServletResponse.SC_OK);
@@ -151,7 +151,7 @@ public class UsersController {
         }
 
         String json = String.format(
-                "{\"message\": \"회원정보 수정 성공\", \"userId\": \"%s\"}",
+                "{\"message\": \"회원정보 수정 성공\", \"userId\": \"%d\"}",
                 updated.getUserId()
         );
 

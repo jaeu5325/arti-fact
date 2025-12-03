@@ -42,7 +42,7 @@ public class LikedService {
                 .orElseThrow(() -> new EntityNotFoundException("Art not found with id: " + request.getArtId()));
 
         // 이미 '좋아요'를 눌렀는지 확인
-        if (likedRepository.findByUser_UserIdAndArt_Id(request.getUserId(), request.getArtId()).isPresent()) {
+        if (likedRepository.findByUser_UserIdAndArt_ArtId(request.getUserId(), request.getArtId()).isPresent()) {
             throw new IllegalStateException("This art is already in the liked list.");
         }
 

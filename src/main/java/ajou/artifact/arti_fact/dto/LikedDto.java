@@ -1,9 +1,19 @@
 package ajou.artifact.arti_fact.dto;
 
+import ajou.artifact.arti_fact.entity.Liked;
 import lombok.*;
 
 public class LikedDto {
 
+    // 좋아요 추가 요청 시 사용
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class Create {
+        private Long userId;
+        private String artId;
+    }
 
     // 좋아요 추가/삭제 요청 시 사용
     @Getter
@@ -27,5 +37,16 @@ public class LikedDto {
         private String imageUrl;  
         private String artistName; 
         private String galleryName;
+
+        public static Response from(Liked liked) {
+            return Response.builder()
+                    .likedId(liked.getLikedId())
+                    .artId(liked.getArt().getArtId())
+                    .artName(liked.getArt().getName())
+                    .imageUrl(liked.getArt().getImageUrl())
+                    .artistName(liked.getArt().getArtist() != null ? liked.getArt().getArtist().getName() : null)
+                    .galleryName(liked.getArt().getGallery() != null ? liked.getArt().getGallery().getName() : null)
+                    .build();
+        }
     }
 }
