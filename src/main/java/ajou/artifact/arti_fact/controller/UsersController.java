@@ -69,20 +69,20 @@ public class UsersController {
     @PostMapping("/login")
     public void login(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        String userId = request.getParameter("userId");
+        String email = request.getParameter("email");
         String pw = request.getParameter("pw");
 
         response.setContentType("application/json; charset=UTF-8");
 
         // 필드 누락 처리
-        if (userId == null || pw == null) {
+        if (email == null || pw == null) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write("{\"message\": \"필수 데이터 누락\"}");
             return;
         }
 
         // 서비스에서 로그인 검증 (이메일과 비밀번호로)
-        User user = usersService.login(userId, pw);
+        User user = usersService.login(email, pw);
 
         if (user == null) {            
             response.setStatus(HttpServletResponse.SC_OK);
