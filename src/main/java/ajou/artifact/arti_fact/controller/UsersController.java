@@ -1,162 +1,103 @@
 package ajou.artifact.arti_fact.controller;
 
+import ajou.artifact.arti_fact.dto.UserDto;
 import ajou.artifact.arti_fact.entity.User;
 import ajou.artifact.arti_fact.service.UsersService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
-import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
+@Tag(name = "Users", description = "회원 관련 API")
 public class UsersController {
 
     private final UsersService usersService;
 
+    // 회원가입
+    @Operation(summary = "회원가입 API")
     @PostMapping
-    public void registerUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-        String userId = request.getParameter("userId");
-        String name = request.getParameter("name");
-        String pw = request.getParameter("pw");
-        String birthDateStr = request.getParameter("birthDate");
-
-        // LocalDate 변환
-        LocalDate birthDate = null;
-        if (birthDateStr != null && !birthDateStr.isEmpty()) {
-            birthDate = LocalDate.parse(birthDateStr);
+    public ResponseEntity<?> registerUser(
+            @Valid @RequestBody UserDto.SignUpRequest request
+    ) {
+        // 이메일 중복 체크
+        if (usersService.existsByEmail(request.getEmail())) {
+            return ResponseEntity.badRequest().body(
+                    "{\"message\": \"이미 존재하는 사용자입니다.\"}"
+            );
         }
 
-        response.setContentType("application/json; charset=UTF-8");
+        // User 엔터티 생성
+        User created = usersService.registerUser(request);
 
-        // 필수값 체크
-        if (userId == null || name == null || pw == null) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().write("{\"message\": \"필수 데이터 누락\"}");
-            return;
-        }
-
-        // Entity 생성
-        User newUser = User.builder()
-                .email(userId)  // userId를 email로 사용
-                .name(name)
-                .password(pw)
-                .birthDate(birthDate)
-                .build();
-
-        // 중복 회원 체크 (이메일로)
-        if (usersService.existsByEmail(newUser.getEmail())) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().write("{\"message\": \"이미 존재하는 사용자입니다.\"}");
-            return;
-        }
-
-        // Service를 통해 DB에 저장
-        User savedUser = usersService.registerUser(newUser);
-
-        // 성공 응답
-        response.setStatus(HttpServletResponse.SC_CREATED);
-        response.getWriter().write(
-                String.format("{\"message\": \"회원가입 성공\", \"userId\": \"%d\"}", savedUser.getUserId())
+        return ResponseEntity.status(201).body(
+                new UserDto.UserResponse(
+                        created.getUserId(),
+                        created.getEmail(),
+                        created.getName(),
+                        created.getBirthDate()
+                )
         );
     }
 
     // 로그인
+    @Operation(summary = "로그인 API")
     @PostMapping("/login")
-    public void login(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public ResponseEntity<?> login(@Valid @RequestBody UserDto.LoginRequest request) {
 
-        String email = request.getParameter("email");
-        String pw = request.getParameter("pw");
+        User user = usersService.login(request.getEmail(), request.getPassword());
 
-        response.setContentType("application/json; charset=UTF-8");
-
-        // 필드 누락 처리
-        if (email == null || pw == null) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().write("{\"message\": \"필수 데이터 누락\"}");
-            return;
+        if (user == null) {
+            return ResponseEntity.ok("{\"message\": \"로그인 실패\"}");
         }
 
-        // 서비스에서 로그인 검증 (이메일과 비밀번호로)
-        User user = usersService.login(email, pw);
-
-        if (user == null) {            
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write("{\"message\": \"로그인 실패\"}");
-            return;
-        }
-
-        // 로그인 성공
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.getWriter().write(
-                String.format("{\"message\": \"로그인 성공\", \"userId\": \"%d\"}", user.getUserId())
-        );
+        return ResponseEntity.ok("{\"message\": \"로그인 성공\", \"userId\": \"" + user.getUserId() + "\"}");
     }
 
-    // 마이페이지
+    // 마이페이지 조회
+    @Operation(summary = "마이페이지 조회")
     @GetMapping("/{userId}")
-    public void getUserInfo(@PathVariable Long userId,
-                            HttpServletResponse response) throws IOException {
-
-        response.setContentType("application/json; charset=UTF-8");
+    public ResponseEntity<?> getUserInfo(@PathVariable Long userId) {
 
         User user = usersService.getUserById(userId);
 
-        if (user == null) {        
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write("{\"message\": \"사용자를 찾을 수 없습니다.\"}");
-            return;
+        if (user == null) {
+            return ResponseEntity.ok("{\"message\": \"사용자를 찾을 수 없습니다.\"}");
         }
 
-        // 유저 정보 JSON 생성
-        String userJson = String.format(
-                "{\"message\": \"사용자 정보 조회 성공\", \"data\": {\"userId\": \"%d\", \"name\": \"%s\", \"email\": \"%s\", \"birthDate\": \"%s\"}}",
-                user.getUserId(),
-                user.getName(),
-                user.getEmail(),
-                user.getBirthDate() != null ? user.getBirthDate().toString() : "null"
+        return ResponseEntity.ok(
+                new UserDto.UserResponse(
+                        user.getUserId(),
+                        user.getEmail(),
+                        user.getName(),
+                        user.getBirthDate()
+                )
         );
-
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.getWriter().write(userJson);
     }
 
-    // 회원정보 수정
+    // 회원 정보 수정
+    @Operation(summary = "회원 정보 수정")
     @PutMapping("/{userId}")
-    public void updateUser(@PathVariable Long userId,
-                        HttpServletRequest request,
-                        HttpServletResponse response) throws IOException {
+    public ResponseEntity<?> updateUser(
+            @PathVariable Long userId,
+            @Valid @RequestBody UserDto.SignUpRequest request
+    ) {
 
-        response.setContentType("application/json; charset=UTF-8");
-
-        String name = request.getParameter("name");
-        String pw = request.getParameter("pw");
-        String birthDateStr = request.getParameter("birthDate");
-
-        LocalDate birthDate = null;
-        if (birthDateStr != null && !birthDateStr.isEmpty()) {
-            birthDate = LocalDate.parse(birthDateStr);
-        }
-
-        User updated = usersService.updateUser(userId, name, pw, birthDate);
+        User updated = usersService.updateUser(
+                userId,
+                request.getName(),
+                request.getPassword(),
+                request.getBirthDate()
+        );
 
         if (updated == null) {
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write("{\"message\": \"사용자를 찾을 수 없습니다.\"}");
-            return;
+            return ResponseEntity.ok("{\"message\": \"사용자를 찾을 수 없습니다.\"}");
         }
 
-        String json = String.format(
-                "{\"message\": \"회원정보 수정 성공\", \"userId\": \"%d\"}",
-                updated.getUserId()
-        );
-
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.getWriter().write(json);
+        return ResponseEntity.ok("{\"message\": \"회원정보 수정 성공\"}");
     }
-
 }
