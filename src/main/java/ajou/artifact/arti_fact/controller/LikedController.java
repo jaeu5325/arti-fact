@@ -33,14 +33,14 @@ public class LikedController {
     }
 
     @PostMapping
-    @Operation(summary = "관심 목록에 작품 추가", description = "관심 목록에 새로운 작품을 추가합니다.")
+    @Operation(summary = "관심 목록 토글 (추가/삭제)", description = "관심 목록에 작품을 추가하거나 이미 있으면 삭제합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "관심 목록 추가 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청")
+            @ApiResponse(responseCode = "200", description = "토글 성공. isLiked 필드로 추가/삭제 여부 확인"),
+            @ApiResponse(responseCode = "404", description = "사용자 또는 작품을 찾을 수 없음")
     })
-    public ResponseEntity<LikedDto.Response> addLikedItem(
+    public ResponseEntity<LikedDto.ToggleResponse> toggleLikedItem(
             @Parameter(description = "관심 목록 추가 요청", required = true) @RequestBody LikedDto.Create request) {
-        return ResponseEntity.ok(likedService.addLikedItem(request));
+        return ResponseEntity.ok(likedService.toggleLikeStatus(request));
     }
 
     @DeleteMapping("/{likedId}")
@@ -50,7 +50,7 @@ public class LikedController {
             @ApiResponse(responseCode = "404", description = "관심 목록을 찾을 수 없음")
     })
     public ResponseEntity<Void> removeLikedItem(
-            @Parameter(description = "관심 목록 ID", required = true) @PathVariable Long likedId) {
+            @Parameter(description = "관심 목록 ID", required = true) @PathVariable String likedId) {
         likedService.removeLikedItem(likedId);
         return ResponseEntity.ok().build();
     }

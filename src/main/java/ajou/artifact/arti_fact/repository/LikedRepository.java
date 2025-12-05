@@ -5,9 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface LikedRepository extends JpaRepository<Liked, Long> {
+public interface LikedRepository extends JpaRepository<Liked, String> {
     List<Liked> findByUser_UserId(Long userId);
     Optional<Liked> findByUser_UserIdAndArt_ArtId(Long userId, String artId);
     void deleteByUser_UserIdAndArt_ArtId(Long userId, String artId);
 }
-

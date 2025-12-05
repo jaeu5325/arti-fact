@@ -30,7 +30,7 @@ public class LikedDto {
     @AllArgsConstructor
     @Builder
     public static class Response {
-        private Long likedId;      // 좋아요 취소(삭제)를 위해 필요한 PK
+        private String likedId;      // 좋아요 취소(삭제)를 위해 필요한 PK
         
         private String artId;     
         private String artName;    
@@ -48,5 +48,14 @@ public class LikedDto {
                     .galleryName(liked.getArt().getGallery() != null ? liked.getArt().getGallery().getName() : null)
                     .build();
         }
+    }
+
+    // 좋아요 토글 응답 시 사용
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ToggleResponse {
+        private boolean isLiked;
+        private Response likedItem;
     }
 }

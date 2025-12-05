@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,26 +35,29 @@ public class LikedService {
     }
 
     @Transactional
-    public LikedDto.Response addLikedItem(LikedDto.Create request) {
+    public LikedDto.ToggleResponse toggleLikeStatus(LikedDto.Create request) {
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + request.getUserId()));
 
         Art art = artRepository.findById(request.getArtId())
                 .orElseThrow(() -> new EntityNotFoundException("Art not found with id: " + request.getArtId()));
 
-        // 이미 '좋아요'를 눌렀는지 확인
-        if (likedRepository.findByUser_UserIdAndArt_ArtId(request.getUserId(), request.getArtId()).isPresent()) {
-            throw new IllegalStateException("This art is already in the liked list.");
+        Optional<Liked> existingLiked = likedRepository.findByUser_UserIdAndArt_ArtId(request.getUserId(), request.getArtId());
+
+        if (existingLiked.isPresent()) {
+            // '좋아요'가 이미 존재하면 삭제
+            likedRepository.delete(existingLiked.get());
+            return new LikedDto.ToggleResponse(false, null); // isLiked: false
+        } else {
+            // '좋아요'가 없으면 새로 생성
+            Liked newLiked = new Liked(user, art);
+            Liked savedLiked = likedRepository.save(newLiked);
+            return new LikedDto.ToggleResponse(true, LikedDto.Response.from(savedLiked)); // isLiked: true
         }
-
-        Liked newLiked = new Liked(user, art);
-        Liked savedLiked = likedRepository.save(newLiked);
-
-        return LikedDto.Response.from(savedLiked);
     }
 
     @Transactional
-    public void removeLikedItem(Long likedId) {
+    public void removeLikedItem(String likedId) {
         if (!likedRepository.existsById(likedId)) {
             throw new EntityNotFoundException("Liked item not found with id: " + likedId);
         }
