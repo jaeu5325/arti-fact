@@ -24,24 +24,34 @@ public class UsersController {
     public ResponseEntity<?> registerUser(
             @Valid @RequestBody UserDto.SignUpRequest request
     ) {
-        // 이메일 중복 체크
-        if (usersService.existsByEmail(request.getEmail())) {
+        try {
+            // 이메일 중복 체크
+            if (usersService.existsByEmail(request.getEmail())) {
+                return ResponseEntity.badRequest().body(
+                        "{\"message\": \"이미 존재하는 사용자입니다.\"}"
+                );
+            }
+
+            // User 엔터티 생성 및 저장
+            User created = usersService.registerUser(request);
+
+            return ResponseEntity.status(201).body(
+                    new UserDto.UserResponse(
+                            created.getUserId(),
+                            created.getEmail(),
+                            created.getName(),
+                            created.getBirthDate()
+                    )
+            );
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(
-                    "{\"message\": \"이미 존재하는 사용자입니다.\"}"
+                    "{\"message\": \"" + e.getMessage() + "\"}"
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(
+                    "{\"message\": \"회원가입 중 오류가 발생했습니다: " + e.getMessage() + "\"}"
             );
         }
-
-        // User 엔터티 생성
-        User created = usersService.registerUser(request);
-
-        return ResponseEntity.status(201).body(
-                new UserDto.UserResponse(
-                        created.getUserId(),
-                        created.getEmail(),
-                        created.getName(),
-                        created.getBirthDate()
-                )
-        );
     }
 
     // 로그인

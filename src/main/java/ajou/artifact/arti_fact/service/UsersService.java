@@ -5,6 +5,7 @@ import ajou.artifact.arti_fact.entity.User;
 import ajou.artifact.arti_fact.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
@@ -16,11 +17,16 @@ public class UsersService {
 
     // 이메일 중복 체크
     public boolean existsByEmail(String email) {
-        return userRepository.existsByEmail(email);
+        return userRepository.findByEmail(email).isPresent();
     }
 
     // 회원가입
+    @Transactional
     public User registerUser(UserDto.SignUpRequest req) {
+        
+        if (existsByEmail(req.getEmail())) {
+            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
+        }
 
         User user = User.builder()
                 .email(req.getEmail())
