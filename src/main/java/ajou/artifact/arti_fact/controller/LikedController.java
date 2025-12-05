@@ -50,7 +50,7 @@ public class LikedController {
             @ApiResponse(responseCode = "404", description = "관심 목록을 찾을 수 없음")
     })
     public ResponseEntity<Void> removeLikedItem(
-            @Parameter(description = "관심 목록 ID", required = true) @PathVariable String likedId) {
+            @Parameter(description = "관심 목록 ID", required = true) @PathVariable Long likedId) {
         likedService.removeLikedItem(likedId);
         return ResponseEntity.ok().build();
     }

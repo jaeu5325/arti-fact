@@ -30,7 +30,7 @@ public class LikedDto {
     @AllArgsConstructor
     @Builder
     public static class Response {
-        private String likedId;      // 좋아요 취소(삭제)를 위해 필요한 PK
+        private Long likedId;      // 좋아요 취소(삭제)를 위해 필요한 PK
         
         private String artId;     
         private String artName;    

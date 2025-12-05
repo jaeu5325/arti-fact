@@ -57,7 +57,7 @@ public class LikedService {
     }
 
     @Transactional
-    public void removeLikedItem(String likedId) {
+    public void removeLikedItem(Long likedId) {
         if (!likedRepository.existsById(likedId)) {
             throw new EntityNotFoundException("Liked item not found with id: " + likedId);
         }

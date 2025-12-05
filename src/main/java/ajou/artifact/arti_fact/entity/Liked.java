@@ -3,8 +3,6 @@ package ajou.artifact.arti_fact.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.UUID;
-
 @Entity
 @Table(name = "LIKED")
 @Getter
@@ -14,8 +12,9 @@ import java.util.UUID;
 public class Liked {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "Liked_ID")
-    private String likedId;
+    private Long likedId;
 
     // User와의 관계 (N:1)
     @ManyToOne(fetch = FetchType.LAZY)
@@ -29,7 +28,6 @@ public class Liked {
 
     // User와 Art를 받는 생성자
     public Liked(User user, Art art) {
-        this.likedId = UUID.randomUUID().toString();
         this.user = user;
         this.art = art;
     }
