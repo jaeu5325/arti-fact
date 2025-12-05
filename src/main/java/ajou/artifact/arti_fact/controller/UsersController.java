@@ -62,10 +62,17 @@ public class UsersController {
         User user = usersService.login(request.getEmail(), request.getPassword());
 
         if (user == null) {
-            return ResponseEntity.ok("{\"message\": \"로그인 실패\"}");
+            return ResponseEntity.status(401).body("{\"message\": \"로그인 실패\"}");
         }
 
-        return ResponseEntity.ok("{\"message\": \"로그인 성공\", \"userId\": \"" + user.getUserId() + "\"}");
+        return ResponseEntity.ok(
+                new UserDto.UserResponse(
+                        user.getUserId(),
+                        user.getEmail(),
+                        user.getName(),
+                        user.getBirthDate()
+                )
+        );
     }
 
     // 마이페이지 조회
