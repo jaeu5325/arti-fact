@@ -27,6 +27,11 @@ public class ArtService {
     public Page<Art> findAllArts(Pageable pageable) {
         return artRepository.findAll(pageable);
     }
+
+    public List<Art> findAllArts() {
+        return artRepository.findAll();
+    }
+
     public Art findArtById(String artId) {
         return artRepository.findById(artId)
                 .orElseThrow(() -> new IllegalArgumentException("Art not found with ID: " + artId));

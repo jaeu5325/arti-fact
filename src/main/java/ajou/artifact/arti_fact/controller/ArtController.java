@@ -2,8 +2,6 @@ package ajou.artifact.arti_fact.controller;
 
 import ajou.artifact.arti_fact.dto.ArtDto;
 import ajou.artifact.arti_fact.entity.Art;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import ajou.artifact.arti_fact.service.ArtService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,9 +35,9 @@ public class ArtController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ArtDto.Response>> findAllArts(Pageable pageable) {
-        Page<Art> artsPage = artService.findAllArts(pageable);
-        List<ArtDto.Response> artResponses = artsPage.getContent().stream()
+    public ResponseEntity<List<ArtDto.Response>> findAllArts() {
+        List<Art> arts = artService.findAllArts();
+        List<ArtDto.Response> artResponses = arts.stream()
                 .map(ArtDto.Response::from)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(artResponses);
