@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface GalleryRepository extends JpaRepository<Gallery, String> {
 
-    List<Gallery> findByNameContainingOrAddressContaining(String name, String address);
+    List<Gallery> findByNameContainingIgnoreCaseOrAddressContainingIgnoreCase(String name, String address);
+
 }
